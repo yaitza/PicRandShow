@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.Windows.Forms.VisualStyles;
 
 namespace PicRandShow
 {
@@ -18,55 +19,34 @@ namespace PicRandShow
         {
             InitializeComponent();
 
-            this.test();
+            Thread th = new Thread(test);
+            th.Start();
+
         }
 
         public void test()
         {
-            String str = ConfigurationSettings.AppSettings["filePath"];
+#pragma warning disable 618
+            String str = ConfigurationSettings.AppSettings["FilePath"];
+            int picCount = int.Parse(ConfigurationSettings.AppSettings["PicturesCount"]);
+            int switchTime = int.Parse(ConfigurationSettings.AppSettings["SwitchTime"]);
+#pragma warning restore 618
             var t = new FileAnalysis(str);
             var names = t.GetAllFile();
-            //this.pictureBox.Image = new System.Drawing.Bitmap(names[300]);
 
-            //foreach (string file in names)
-            //{
-            //    this.pictureBox.Image =new  System.Drawing.Bitmap(file);
-            //    Thread.Sleep(1000);
-            //}
-            ShowPictures(5, 1, names.ToArray());
+            ShowPictures(picCount, switchTime, names.ToArray());
         }
 
         public void ShowPictures(int pics, int sec, string[] names)
         {
-            //while (true)
+            for (int i = 0; i < pics; i++)
             {
-                for (int i = 0; i < pics; i++)
-                {
-                    Random rd = new Random();
-                    string fileName = names[rd.Next(0, 400)];
-                    int width = this.Width;
-                    int height = this.Height;
+                Random rd = new Random();
+                Thread th = new Thread(new ParameterizedThreadStart(PicPlay));
+                th.Start(names[rd.Next(0, 450)]);
+                Thread.Sleep(1000 * sec);
 
-
-                    PictureBox pic = new PictureBox();
-                    pic.Size = new Size(100, 50);
-                    pic.SizeMode = PictureBoxSizeMode.AutoSize;
-                    pic.Location = new Point(rd.Next(0, height), rd.Next(0, width));
-                    Bitmap bm = new Bitmap(fileName);
-                    pic.Image = bm;
-                    this.Controls.Add(pic);
-                    //Thread th = new Thread(new ParameterizedThreadStart(PicPlay));
-                    //th.Start(names[i]);
-                    this.Refresh();
-
-                }
-
-                Thread.Sleep(1000 * 5);
-                //this.Controls.Clear();
-                this.Refresh();
-                Thread.Sleep(1000 * 3);
             }
-
         }
 
         public void PicPlay(object file)
@@ -76,14 +56,30 @@ namespace PicRandShow
             int height = this.Height;
             Random rd = new Random();
 
-
             PictureBox pic = new PictureBox();
-            pic.Size = new Size(50, 50);
+            pic.SizeMode = PictureBoxSizeMode.AutoSize;
             pic.Location = new Point(rd.Next(0, height), rd.Next(0, width));
             Bitmap bm = new Bitmap(fileName);
             pic.Image = bm;
-            this.Controls.Add(pic);
+            pic.BringToFront();
+            this.AddPictureBox(pic);
 
+        }
+
+        private delegate void PanelAddPictureBox(PictureBox pb);
+
+        public void AddPictureBox(PictureBox pb)
+        {
+            if (this.panel.InvokeRequired)
+            {
+                PanelAddPictureBox papb = new PanelAddPictureBox(AddPictureBox);
+                this.Invoke(papb, new object[] { pb });
+            }
+            else
+            {
+                this.panel.Controls.Add(pb);
+                this.panel.Refresh();
+            }
         }
     }
 }
