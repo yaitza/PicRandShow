@@ -18,38 +18,33 @@ namespace PicRandShow
 
         private int intervalTime;
 
-        private DisplayEnum displayMode;
-
-        public DisplayHandler(Point sizeXY, List<string> strFilePath, int photoCount = 1, int switchTime = 2, DisplayEnum displayMode = DisplayEnum.Single)
+        public DisplayHandler(Point sizeXY, List<string> strFilePath, int photoCount = 1, int switchTime = 2)
         {
             this.formXY = sizeXY;
             this.strFilePath = strFilePath;
             this.disPhotoCount = photoCount;
             this.intervalTime = switchTime;
-            this.displayMode = displayMode;
         }
 
-        public void PhotoPlay()
+        public PictureBox[] PhotoPlay(DisplayEnum displayMode = DisplayEnum.Single)
         {
             switch (displayMode)
             {
                 case DisplayEnum.Single:
-                    PlaySingle();
-                    break;
+                    return PlaySingle();
                 case DisplayEnum.Multiple:
-                    PlayMultiple();
-                    break;
+                    return PlayMultiple();
                 case DisplayEnum.Random:
-                    PlayRandom();
-                    break;
+                    return PlayRandom();
                 default:
-                    break;
+                    return PlaySingle();
             }
         }
 
-        public PictureBox PlaySingle()
+        private PictureBox[] PlaySingle()
         {
             Image photo = Image.FromFile(this.strFilePath.First());
+
             int photoWidthX = photo.Width;
             int photoHeightY = photo.Height;
 
@@ -59,16 +54,16 @@ namespace PicRandShow
             Random ra = new Random();
             int widthX = ra.Next(0, panelWidthX - photoWidthX);
             int heightY = ra.Next(0, panelHeightY - photoHeightY);
-
+            WritingOutput.ShowMessage($"[{widthX},{heightY}]  {this.strFilePath.First()}");
             PictureBox pb = new PictureBox();
             pb.Location = new Point(widthX, heightY);
             pb.SizeMode = PictureBoxSizeMode.AutoSize;
             pb.Image = photo;
 
-            return pb;
+            return new PictureBox[] { pb };
         }
 
-        public List<PictureBox> PlayMultiple()
+        private PictureBox[] PlayMultiple()
         {
             int panelWidthX = this.formXY.X;
             int panelHeightY = this.formXY.Y;
@@ -89,7 +84,7 @@ namespace PicRandShow
 
                 int widthX = ra.Next(0, panelWidthX - photoWidthX);
                 int heightY = ra.Next(0, panelHeightY - photoHeightY);
-
+                WritingOutput.ShowMessage($"[{widthX},{heightY}]  {this.strFilePath[i]}");
                 PictureBox pb = new PictureBox();
                 pb.Location = new Point(widthX, heightY);
                 pb.SizeMode = PictureBoxSizeMode.AutoSize;
@@ -98,36 +93,37 @@ namespace PicRandShow
                 listPB.Add(pb);
             }
 
-            return listPB;
+            return listPB.ToArray();
         }
 
-        public PictureBox PlayRandom()
+        private PictureBox[] PlayRandom()
         {
             int panelWidthX = this.formXY.X;
             int panelHeightY = this.formXY.Y;
 
             Random ra = new Random();
 
-            string file = this.strFilePath[ra.Next(0, disPhotoCount)];
+            string file = this.strFilePath[ra.Next(0, this.strFilePath.Count)];
             Image photo = Image.FromFile(file);
             int photoWidthX = photo.Width;
             int photoHeightY = photo.Height;
 
             if (photoWidthX >= panelWidthX || photoHeightY >= panelHeightY)
             {
+                //WritingOutput.ShowMessage($"图片{file}分辨率超过窗口超限");
                 throw new Exception($"图片{file}分辨率超过窗口超限");
             }
 
             int widthX = ra.Next(0, panelWidthX - photoWidthX);
             int heightY = ra.Next(0, panelHeightY - photoHeightY);
+            WritingOutput.ShowMessage($"[{widthX},{heightY}]  {file}");
 
             PictureBox pb = new PictureBox();
             pb.Location = new Point(widthX, heightY);
             pb.SizeMode = PictureBoxSizeMode.AutoSize;
             pb.Image = photo;
 
-            return pb;
-
+            return new PictureBox[] { pb };
         }
     }
 }

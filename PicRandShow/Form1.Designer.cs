@@ -30,6 +30,8 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.panel = new System.Windows.Forms.Panel();
+            this.labelOutput = new System.Windows.Forms.Label();
+            this.panel.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel
@@ -37,11 +39,22 @@
             this.panel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel.Controls.Add(this.labelOutput);
             this.panel.Location = new System.Drawing.Point(-2, 0);
             this.panel.Name = "panel";
             this.panel.Size = new System.Drawing.Size(843, 634);
             this.panel.TabIndex = 0;
-           
+            // 
+            // labelOutput
+            // 
+            this.labelOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelOutput.AutoSize = true;
+            this.labelOutput.ForeColor = System.Drawing.Color.Red;
+            this.labelOutput.Location = new System.Drawing.Point(3, 619);
+            this.labelOutput.Name = "labelOutput";
+            this.labelOutput.Size = new System.Drawing.Size(41, 12);
+            this.labelOutput.TabIndex = 0;
+            this.labelOutput.Text = "Output";
             // 
             // MainForm
             // 
@@ -52,6 +65,8 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "PicRandomPlay";
+            this.panel.ResumeLayout(false);
+            this.panel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -59,6 +74,7 @@
         #endregion
 
         private System.Windows.Forms.Panel panel;
+        private System.Windows.Forms.Label labelOutput;
     }
 }
 

@@ -35,6 +35,8 @@ namespace PicRandShow
             this.displayMode = CommonHelper.ToDisplayEnum(ConfigurationSettings.AppSettings["DisplayMode"]);
             this.displayTimes = int.Parse(ConfigurationSettings.AppSettings["DisplayTimes"]);
 
+            WritingOutput.ShowMethod += this.OutputLabel;
+
 
             Thread th = new Thread(DisplayPhotos);
             th.Start();
@@ -48,73 +50,60 @@ namespace PicRandShow
 
             if (names.Count == 0)
             {
+                WritingOutput.ShowMethod($"{this.filePath}下无任何图片。");
                 return;
             }
 
-            //for (int i = 0; i < this.displayTimes; i++)
-            //{
-            //    DisplayHandler dh = new DisplayHandler(new Point(this.panel.Width, this.panel.Height), names, this.picCount, this.intervalTime);
-
-            //    PictureBox pb = dh.PlaySingle();
-            //    this.AddPictureBox(new PictureBox[] { pb });
-            //    Thread.Sleep(1000 * this.intervalTime);
-            //    this.DeletePictureBox(new PictureBox[] { pb });
-            //}
-
-            //for (int i = 0; i < this.displayTimes; i++)
-            //{
-            //    DisplayHandler dh = new DisplayHandler(new Point(this.panel.Width, this.panel.Height), names, this.picCount, this.intervalTime, this.displayMode);
-
-            //    PictureBox[] pb = dh.PlayMultiple().ToArray();
-            //    this.AddPictureBox(pb);
-            //    Thread.Sleep(1000 * this.intervalTime);
-            //    this.DeletePictureBox(pb);
-            //}
-
-            for (int i = 0; i < this.displayTimes; i++)
+            for(int i=0; i<this.displayTimes; i++)
             {
-                DisplayHandler dh = new DisplayHandler(new Point(this.panel.Width, this.panel.Height), names, this.picCount, this.intervalTime, this.displayMode);
-
-                PictureBox pb = dh.PlayRandom();
-                this.AddPictureBox(new PictureBox[] { pb });
-                Thread.Sleep(1000 * this.intervalTime);
-                this.DeletePictureBox(new PictureBox[] { pb });
+                try
+                {
+                    DisplayHandler dh = new DisplayHandler(new Point(this.panel.Width, this.panel.Height), names, this.picCount, this.intervalTime);
+                    PictureBox[] pbArray = dh.PhotoPlay(this.displayMode);
+                    this.AddPictureBox(pbArray);
+                    Thread.Sleep(1000 * this.intervalTime);
+                    this.DeletePictureBox(pbArray);
+                }catch(Exception ex)
+                {
+                    WritingOutput.ShowMethod(ex.Message);
+                    continue;
+                }
             }
-
-            //ShowPictures(this.picCount, this.switchTime, names.ToArray());
+            WritingOutput.ShowMethod("图片展示完毕。");
         }
 
-        public void ShowPictures(int pics, int sec, string[] names)
-        {
-            for (int i = 0; i < pics; i++)
-            {
-                Random rd = new Random();
-                Thread th = new Thread(new ParameterizedThreadStart(PicPlay));
-                th.Start(names[rd.Next(0, 450)]);
-                Thread.Sleep(1000 * sec);
-            }
-        }
+        #region 参考
+        //public void ShowPictures(int pics, int sec, string[] names)
+        //{
+        //    for (int i = 0; i < pics; i++)
+        //    {
+        //        Random rd = new Random();
+        //        Thread th = new Thread(new ParameterizedThreadStart(PicPlay));
+        //        th.Start(names[rd.Next(0, 450)]);
+        //        Thread.Sleep(1000 * sec);
+        //    }
+        //}
 
-        public void PicPlay(object file)
-        {
-            string fileName = (string)file;
-            int pWidthX = this.panel.Width;
-            int pheightY = this.panel.Height;
-            Random rd = new Random();
+        //public void PicPlay(object file)
+        //{
+        //    string fileName = (string)file;
+        //    int pWidthX = this.panel.Width;
+        //    int pheightY = this.panel.Height;
+        //    Random rd = new Random();
 
-            Image photo = Image.FromFile(fileName);
-            int phWidthX = photo.Width;  //照片宽度像素值
-            int phHeightY = photo.Height;//照片高度像素值
+        //    Image photo = Image.FromFile(fileName);
+        //    int phWidthX = photo.Width;  //照片宽度像素值
+        //    int phHeightY = photo.Height;//照片高度像素值
 
-            PictureBox picbox = new PictureBox();
-            picbox.SizeMode = PictureBoxSizeMode.AutoSize;
+        //    PictureBox picbox = new PictureBox();
+        //    picbox.SizeMode = PictureBoxSizeMode.AutoSize;
 
-            picbox.Location = new Point(pWidthX / 2 - phWidthX / 2, pheightY / 2 - phHeightY / 2);
-            picbox.Image = photo;
-            picbox.BringToFront();
-            this.AddPictureBox(new PictureBox[] { picbox });
-
-        }
+        //    picbox.Location = new Point(pWidthX / 2 - phWidthX / 2, pheightY / 2 - phHeightY / 2);
+        //    picbox.Image = photo;
+        //    picbox.BringToFront();
+        //    this.AddPictureBox(new PictureBox[] { picbox });
+        //}
+        #endregion
 
         private delegate void PanelAddPictureBox(PictureBox[] pb);
 
@@ -148,6 +137,24 @@ namespace PicRandShow
                     this.panel.Controls.Remove(pictureBox);
                 }
                 this.panel.Refresh();
+            }
+        }
+
+        private delegate void DisplayMessage(string msg);
+
+
+        private void OutputLabel(string msg)
+        {
+            if (this.labelOutput.InvokeRequired)
+            {
+                DisplayMessage dm = new DisplayMessage(OutputLabel);
+                this.Invoke(dm, new object[] { msg});
+            }
+            else
+            {
+                this.labelOutput.Text = $"坐标:{msg} {Environment.NewLine}";
+                this.labelOutput.Focus();
+
             }
         }
     }
