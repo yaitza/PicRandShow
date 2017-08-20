@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
-using System.Windows.Forms.VisualStyles;
 
 namespace PicRandShow
 {
@@ -152,9 +145,8 @@ namespace PicRandShow
             }
             else
             {
-                this.labelOutput.Text = $"坐标:{msg} {Environment.NewLine}";
+                this.labelOutput.Text = $"{msg} {Environment.NewLine}";
                 this.labelOutput.Focus();
-
             }
         }
     }

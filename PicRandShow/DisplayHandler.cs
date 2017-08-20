@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -54,7 +56,7 @@ namespace PicRandShow
             Random ra = new Random();
             int widthX = ra.Next(0, panelWidthX - photoWidthX);
             int heightY = ra.Next(0, panelHeightY - photoHeightY);
-            WritingOutput.ShowMessage($"[{widthX},{heightY}]  {this.strFilePath.First()}");
+            WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {this.strFilePath.First()}");
             PictureBox pb = new PictureBox();
             pb.Location = new Point(widthX, heightY);
             pb.SizeMode = PictureBoxSizeMode.AutoSize;
@@ -65,6 +67,7 @@ namespace PicRandShow
 
         private PictureBox[] PlayMultiple()
         {
+            List<string> picLoactionInfos = new List<string>();
             int panelWidthX = this.formXY.X;
             int panelHeightY = this.formXY.Y;
 
@@ -73,7 +76,7 @@ namespace PicRandShow
             {
                 Random ra = new Random();
 
-                Image photo = Image.FromFile(this.strFilePath[i]);
+                Image photo = Image.FromFile(this.strFilePath[ra.Next(0, this.strFilePath.Count)]);
                 int photoWidthX = photo.Width;
                 int photoHeightY = photo.Height;
 
@@ -84,16 +87,106 @@ namespace PicRandShow
 
                 int widthX = ra.Next(0, panelWidthX - photoWidthX);
                 int heightY = ra.Next(0, panelHeightY - photoHeightY);
-                WritingOutput.ShowMessage($"[{widthX},{heightY}]  {this.strFilePath[i]}");
+
+                string picLocation = $"{widthX}|{heightY}|{photoWidthX}|{photoHeightY}";
+
+                if (picLoactionInfos.Count >= 1)
+                {
+                    if (!this.IsFullDispaly(picLoactionInfos, picLocation))
+                    {
+                        WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {this.strFilePath[i]} 与之前图片位置冲突");
+                        continue;
+                    }
+                }
+
+                WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {this.strFilePath[i]}");
                 PictureBox pb = new PictureBox();
                 pb.Location = new Point(widthX, heightY);
                 pb.SizeMode = PictureBoxSizeMode.AutoSize;
                 pb.Image = photo;
 
                 listPB.Add(pb);
+                picLoactionInfos.Add(picLocation);
             }
 
             return listPB.ToArray();
+        }
+
+        /// <summary>
+        /// 判断图片是否重叠
+        /// </summary>
+        /// <param name="picLocations">已添加图片位置信息</param>
+        /// <param name="location">新添加图片位置信息</param>
+        /// <returns>是否重叠</returns>
+        private bool IsFullDispaly(List<string> picLocations, string location)
+        {
+            List<bool> isInEveryPicRegion = new List<bool>();
+
+            string[] imageLocInfo = location.Split('|');
+            int imgX = int.Parse(imageLocInfo[0]);
+            int imgY = int.Parse(imageLocInfo[1]);
+            int imgWidth = int.Parse(imageLocInfo[2]);
+            int imgHeight = int.Parse(imageLocInfo[3]);
+            Point[] imgPoints = {
+                    new Point(imgX, imgY),
+                    new Point(imgX + imgWidth, imgY),
+                    new Point(imgX + imgWidth, imgY + imgHeight),
+                    new Point(imgX, imgY + imgHeight)
+                };
+
+            Region imgRegion = new Region();
+            GraphicsPath imgPolygon = new GraphicsPath();
+            imgPolygon.Reset();
+            imgPolygon.AddPolygon(imgPoints);
+            imgRegion.MakeEmpty();
+            imgRegion.Union(imgPolygon);
+
+            foreach (string picLocation in picLocations)
+            {
+                string[] picLocInfo = picLocation.Split('|');
+                int picX = int.Parse(picLocInfo[0]);
+                int picY = int.Parse(picLocInfo[1]);
+                int picWidth = int.Parse(picLocInfo[2]);
+                int picHeight = int.Parse(picLocInfo[3]);
+                Point[] picPoints = {
+                    new Point(picX, picY),
+                    new Point(picX + picWidth, picY),
+                    new Point(picX + picWidth, picY + picHeight),
+                    new Point(picX, picY + picHeight)
+                };
+
+                Region picRegion = new Region();
+                GraphicsPath picPolygon = new GraphicsPath();
+                picPolygon.Reset();
+                picPolygon.AddPolygon(picPoints);
+                picRegion.MakeEmpty();
+                picRegion.Union(picPolygon);
+
+                bool isInPicRegion = true;
+                foreach (Point imgPoint in imgPoints)
+                {
+                    //WritingOutput.ShowMessage($"Point:{imgPoint.X},{imgPoint.Y}[{!picRegion.IsVisible(imgPoint)}]在区域[{picX},{picY}][{picX + picWidth},{picY + picHeight}]");
+                    isInPicRegion = isInPicRegion && !picRegion.IsVisible(imgPoint);
+                    //Thread.Sleep(1000 * 3);
+
+                }
+
+                foreach (Point picPoint in picPoints)
+                {
+                    isInPicRegion = isInPicRegion && !imgRegion.IsVisible(picPoint);
+                }
+
+                isInEveryPicRegion.Add(isInPicRegion);
+            }
+
+            bool isAddThePic = true;
+            foreach (bool isInRegion in isInEveryPicRegion)
+            {
+                isAddThePic = isAddThePic && isInRegion;
+            }
+
+            return isAddThePic;
+
         }
 
         private PictureBox[] PlayRandom()
@@ -116,7 +209,7 @@ namespace PicRandShow
 
             int widthX = ra.Next(0, panelWidthX - photoWidthX);
             int heightY = ra.Next(0, panelHeightY - photoHeightY);
-            WritingOutput.ShowMessage($"[{widthX},{heightY}]  {file}");
+            WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {file}");
 
             PictureBox pb = new PictureBox();
             pb.Location = new Point(widthX, heightY);
