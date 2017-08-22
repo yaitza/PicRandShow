@@ -59,6 +59,7 @@ namespace PicRandShow
                 }catch(Exception ex)
                 {
                     WritingOutput.ShowMethod(ex.Message);
+                    Thread.Sleep(1000 * this.intervalTime);
                     continue;
                 }
             }
