@@ -52,7 +52,7 @@ namespace PicRandShow
                 try
                 {
                     DisplayHandler dh = new DisplayHandler(new Point(this.panel.Width, this.panel.Height), names, this.picCount, this.intervalTime);
-                    PictureBox[] pbArray = dh.PhotoPlay(this.displayMode);
+                    PictureBox[] pbArray = dh.PhotoPlay(i, this.displayMode);
                     this.AddPictureBox(pbArray);
                     Thread.Sleep(1000 * this.intervalTime);
                     this.DeletePictureBox(pbArray);

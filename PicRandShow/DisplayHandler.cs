@@ -28,7 +28,7 @@ namespace PicRandShow
             this.intervalTime = switchTime;
         }
 
-        public PictureBox[] PhotoPlay(DisplayEnum displayMode = DisplayEnum.Single)
+        public PictureBox[] PhotoPlay(int iCount, DisplayEnum displayMode = DisplayEnum.Single)
         {
             switch (displayMode)
             {
@@ -38,9 +38,51 @@ namespace PicRandShow
                     return PlayMultiple();
                 case DisplayEnum.Random:
                     return PlayRandom();
+                case DisplayEnum.Sequence:
+                    return PlaySequence(iCount);
                 default:
                     return PlaySingle();
             }
+        }
+
+        private PictureBox[] PlaySequence(int iCount)
+        {
+            int iImagePosition = iCount;
+            if (iCount > this.strFilePath.Count)
+            {
+                iImagePosition = iCount - this.strFilePath.Count - 1;
+            }
+
+            Image photo = Image.FromFile(this.strFilePath[iImagePosition]);
+
+            int photoWidthX = photo.Width;
+            int photoHeightY = photo.Height;
+
+            int panelWidthX = this.formXY.X;
+            int panelHeightY = this.formXY.Y;
+
+            Random ra = new Random();
+            int widthX = ra.Next(0, Math.Abs(panelWidthX - 400));
+            int heightY = ra.Next(0, Math.Abs(panelHeightY - 600));
+            WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {this.strFilePath[iImagePosition]}");
+            PictureBox pb = new PictureBox();
+            pb.Location = new Point(widthX, heightY);
+
+            if (panelWidthX < photoWidthX || panelHeightY < photoHeightY)
+            {
+                pb.SizeMode = PictureBoxSizeMode.StretchImage;
+                pb.Size = new Size(400, 600);
+            }
+            else
+            {
+                pb.SizeMode = PictureBoxSizeMode.AutoSize;
+            }
+            
+            pb.Image = photo;
+
+            return new PictureBox[] { pb };
+
+            throw new NotImplementedException();
         }
 
         private PictureBox[] PlaySingle()
@@ -71,7 +113,7 @@ namespace PicRandShow
             int panelWidthX = this.formXY.X;
             int panelHeightY = this.formXY.Y;
 
-            List<PictureBox> listPB = new List<PictureBox>();
+            List<PictureBox> listPb = new List<PictureBox>();
             for (int i = 0; i < this.disPhotoCount; i++)
             {
                 Random ra = new Random();
@@ -105,11 +147,11 @@ namespace PicRandShow
                 pb.SizeMode = PictureBoxSizeMode.AutoSize;
                 pb.Image = photo;
 
-                listPB.Add(pb);
+                listPb.Add(pb);
                 picLoactionInfos.Add(picLocation);
             }
 
-            return listPB.ToArray();
+            return listPb.ToArray();
         }
 
         /// <summary>
