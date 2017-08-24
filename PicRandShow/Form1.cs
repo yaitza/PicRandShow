@@ -129,6 +129,8 @@ namespace PicRandShow
                 foreach(PictureBox pictureBox in pb)
                 {
                     this.panel.Controls.Remove(pictureBox);
+                    pictureBox.Image.Dispose();
+                    pictureBox.Dispose();
                 }
                 this.panel.Refresh();
             }
