@@ -50,7 +50,7 @@ namespace PicRandShow
             int iImagePosition = iCount;
             if (iCount > this.strFilePath.Count)
             {
-                iImagePosition = iCount - this.strFilePath.Count - 1;
+                iImagePosition = iCount % this.strFilePath.Count;
             }
 
             Image photo = Image.FromFile(this.strFilePath[iImagePosition]);
@@ -77,7 +77,7 @@ namespace PicRandShow
             {
                 pb.SizeMode = PictureBoxSizeMode.AutoSize;
             }
-            
+
             pb.Image = photo;
 
             return new PictureBox[] { pb };
