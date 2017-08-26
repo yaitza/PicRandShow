@@ -132,8 +132,11 @@ namespace PicRandShow
                     pictureBox.Image.Dispose();
                     pictureBox.Dispose();
                 }
+                pb = null;
+                this.panel.Controls.Clear();
                 this.panel.Refresh();
             }
+            GC.Collect();
         }
 
         private delegate void DisplayMessage(string msg);
