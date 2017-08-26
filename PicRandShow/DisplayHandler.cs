@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace PicRandShow
             this.intervalTime = switchTime;
         }
 
-        public PictureBox[] PhotoPlay(DisplayEnum displayMode = DisplayEnum.Single)
+        public PictureBox[] PhotoPlay(int iCount, DisplayEnum displayMode = DisplayEnum.Single)
         {
             switch (displayMode)
             {
@@ -38,14 +39,22 @@ namespace PicRandShow
                     return PlayMultiple();
                 case DisplayEnum.Random:
                     return PlayRandom();
+                case DisplayEnum.Sequence:
+                    return PlaySequence(iCount);
                 default:
                     return PlaySingle();
             }
         }
 
-        private PictureBox[] PlaySingle()
+        private PictureBox[] PlaySequence(int iCount)
         {
-            Image photo = Image.FromFile(this.strFilePath.First());
+            int iImagePosition = iCount;
+            if (iCount > this.strFilePath.Count)
+            {
+                iImagePosition = iCount % this.strFilePath.Count;
+            }
+
+            Image photo = Image.FromFile(this.strFilePath[iImagePosition]);
 
             int photoWidthX = photo.Width;
             int photoHeightY = photo.Height;
@@ -54,14 +63,66 @@ namespace PicRandShow
             int panelHeightY = this.formXY.Y;
 
             Random ra = new Random();
-            int widthX = ra.Next(0, panelWidthX - photoWidthX);
-            int heightY = ra.Next(0, panelHeightY - photoHeightY);
-            WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {this.strFilePath.First()}");
+            int widthX = 0;
+            int heightY = 0;
             PictureBox pb = new PictureBox();
+
+            if (panelWidthX < photoWidthX || panelHeightY < photoHeightY)
+            {
+                pb.SizeMode = PictureBoxSizeMode.StretchImage;
+                pb.Size = new Size(400, 600);
+                widthX = ra.Next(0, Math.Abs(panelWidthX - 400));
+                heightY = ra.Next(0, Math.Abs(panelHeightY - 600));
+            }
+            else
+            {
+                pb.SizeMode = PictureBoxSizeMode.AutoSize;
+                widthX = ra.Next(0, Math.Abs(panelWidthX - photoWidthX));
+                heightY = ra.Next(0, Math.Abs(panelHeightY - photoHeightY));
+            }
             pb.Location = new Point(widthX, heightY);
-            pb.SizeMode = PictureBoxSizeMode.AutoSize;
             pb.Image = photo;
 
+            WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {this.strFilePath[iImagePosition]}");
+
+            return new PictureBox[] { pb };
+        }
+
+        private PictureBox[] PlaySingle()
+        {
+            Image photo = Image.FromFile(this.strFilePath.First());
+
+            int photoWidth = photo.Width;
+            int photoHeight = photo.Height;
+
+            int panelWidth = this.formXY.X;
+            int panelHeight = this.formXY.Y;
+
+            PictureBox pb = new PictureBox();
+
+            Random ra = new Random();
+            int pointX = 0;
+            int pointY = 0;
+
+            if (photoWidth > panelWidth || photoHeight > panelHeight)
+            {
+                pb.Location = new Point(pointX, pointY);
+                pb.SizeMode = PictureBoxSizeMode.StretchImage;
+                pb.Size = new Size(400, 600);
+                pointX = ra.Next(0, Math.Abs(panelWidth - 400));
+                pointY = ra.Next(0, Math.Abs(panelHeight - 600));
+            }
+            else
+            {
+                pb.SizeMode = PictureBoxSizeMode.AutoSize;
+                pointX = ra.Next(0, Math.Abs(panelWidth - photoWidth));
+                pointY = ra.Next(0, Math.Abs(panelHeight - photoHeight));
+            }
+
+            pb.Location = new Point(pointX, pointY);
+            pb.Image = photo;
+
+            WritingOutput.ShowMessage($"坐标:[{pointX},{pointY}]  {this.strFilePath.First()}");
             return new PictureBox[] { pb };
         }
 
@@ -71,45 +132,91 @@ namespace PicRandShow
             int panelWidthX = this.formXY.X;
             int panelHeightY = this.formXY.Y;
 
-            List<PictureBox> listPB = new List<PictureBox>();
+            List<PictureBox> listPb = new List<PictureBox>();
             for (int i = 0; i < this.disPhotoCount; i++)
             {
                 Random ra = new Random();
 
                 Image photo = Image.FromFile(this.strFilePath[ra.Next(0, this.strFilePath.Count)]);
-                int photoWidthX = photo.Width;
-                int photoHeightY = photo.Height;
+                int photoWidth = photo.Width;
+                int photoHeight = photo.Height;
 
-                if (photoWidthX >= panelWidthX || photoHeightY >= panelHeightY)
+                int pointX = 0;
+                int pointY = 0;
+
+                PictureBox pb = new PictureBox();
+                string picLocation;
+                if (photoWidth >= panelWidthX || photoHeight >= panelHeightY)
                 {
-                    continue;
+                    pb.SizeMode = PictureBoxSizeMode.StretchImage;
+                    pb.Size = new Size(400, 600);
+                    pointX = ra.Next(0, panelWidthX - 400);
+                    pointY = ra.Next(0, panelHeightY - 600);
+                    picLocation = $"{pointX}|{pointY}|{400}|{600}";
+                }
+                else
+                {
+                    pb.SizeMode = PictureBoxSizeMode.AutoSize;
+                    pointX = ra.Next(0, panelWidthX - photoWidth);
+                    pointY = ra.Next(0, panelHeightY - photoHeight);
+                    picLocation = $"{pointX}|{pointY}|{photoWidth}|{photoHeight}";
                 }
 
-                int widthX = ra.Next(0, panelWidthX - photoWidthX);
-                int heightY = ra.Next(0, panelHeightY - photoHeightY);
-
-                string picLocation = $"{widthX}|{heightY}|{photoWidthX}|{photoHeightY}";
-
-                if (picLoactionInfos.Count >= 1)
+                if (picLoactionInfos.Count > 0)
                 {
                     if (!this.IsFullDispaly(picLoactionInfos, picLocation))
                     {
-                        WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {this.strFilePath[i]} 与之前图片位置冲突");
+                        WritingOutput.ShowMessage($"坐标:[{pointX},{pointY}]  {this.strFilePath[i]} 与之前图片位置冲突");
                         continue;
                     }
                 }
 
-                WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {this.strFilePath[i]}");
-                PictureBox pb = new PictureBox();
-                pb.Location = new Point(widthX, heightY);
-                pb.SizeMode = PictureBoxSizeMode.AutoSize;
+                WritingOutput.ShowMessage($"坐标:[{pointX},{pointY}]  {this.strFilePath[i]}");
+
+                pb.Location = new Point(pointX, pointY);
                 pb.Image = photo;
 
-                listPB.Add(pb);
+                listPb.Add(pb);
                 picLoactionInfos.Add(picLocation);
             }
 
-            return listPB.ToArray();
+            return listPb.ToArray();
+        }
+
+        private PictureBox[] PlayRandom()
+        {
+            int panelWidthX = this.formXY.X;
+            int panelHeightY = this.formXY.Y;
+            Random ra = new Random();
+
+            string file = this.strFilePath[ra.Next(0, this.strFilePath.Count)];
+            Image photo = Image.FromFile(file);
+            int photoWidthX = photo.Width;
+            int photoHeightY = photo.Height;
+
+            PictureBox pb = new PictureBox();
+            int widthX = 0;
+            int heightY = 0;
+            if (photoWidthX >= panelWidthX || photoHeightY >= panelHeightY)
+            {
+                WritingOutput.ShowMessage($"图片{file}分辨率超过窗口超限");
+                pb.SizeMode = PictureBoxSizeMode.StretchImage;
+                pb.Size = new Size(400, 600);
+                widthX = ra.Next(0, Math.Abs(panelWidthX - 400));
+                heightY = ra.Next(0, Math.Abs(panelHeightY - 600));
+            }
+            else
+            {
+                pb.SizeMode = PictureBoxSizeMode.AutoSize;
+                widthX = ra.Next(0, Math.Abs(panelWidthX - photoWidthX));
+                heightY = ra.Next(0, Math.Abs(panelHeightY - photoHeightY));
+            }
+            pb.Location = new Point(widthX, heightY);
+            pb.Image = photo;
+
+            WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {file}");
+
+            return new PictureBox[] { pb };
         }
 
         /// <summary>
@@ -189,34 +296,32 @@ namespace PicRandShow
 
         }
 
-        private PictureBox[] PlayRandom()
+        /// <summary>
+        /// 判断图片落点是否在界面内
+        /// </summary>
+        /// <param name="pbLocationInfo">"pointX|pointY|panelWidth|panelHeight|imgWidth|imgHeight"</param>
+        /// <returns>是否在界面内</returns>
+        private bool IsImageInPanel(string pbLocationInfo)
         {
-            int panelWidthX = this.formXY.X;
-            int panelHeightY = this.formXY.Y;
+            bool isImageInPanel = false;
 
-            Random ra = new Random();
+            string[] locationInfo = pbLocationInfo.Split('|');
 
-            string file = this.strFilePath[ra.Next(0, this.strFilePath.Count)];
-            Image photo = Image.FromFile(file);
-            int photoWidthX = photo.Width;
-            int photoHeightY = photo.Height;
+            int pointX = int.Parse(locationInfo[0]);
+            int pointY = int.Parse(locationInfo[1]);
 
-            if (photoWidthX >= panelWidthX || photoHeightY >= panelHeightY)
+            int panelWidth = int.Parse(locationInfo[2]);
+            int panelHeight = int.Parse(locationInfo[3]);
+
+            int imgWidth = int.Parse(locationInfo[4]);
+            int imgHeight = int.Parse(locationInfo[5]);
+
+            if (pointX+imgWidth<= panelWidth && pointY+imgHeight<=panelHeight)
             {
-                //WritingOutput.ShowMessage($"图片{file}分辨率超过窗口超限");
-                throw new Exception($"图片{file}分辨率超过窗口超限");
+                isImageInPanel = true;
             }
 
-            int widthX = ra.Next(0, panelWidthX - photoWidthX);
-            int heightY = ra.Next(0, panelHeightY - photoHeightY);
-            WritingOutput.ShowMessage($"坐标:[{widthX},{heightY}]  {file}");
-
-            PictureBox pb = new PictureBox();
-            pb.Location = new Point(widthX, heightY);
-            pb.SizeMode = PictureBoxSizeMode.AutoSize;
-            pb.Image = photo;
-
-            return new PictureBox[] { pb };
+            return isImageInPanel;
         }
     }
 }

@@ -14,6 +14,8 @@ namespace PicRandShow
             {
                 case "single":
                     return DisplayEnum.Single;
+                case "sequence":
+                    return DisplayEnum.Sequence;
                 case "multiple":
                     return DisplayEnum.Multiple;
                 case "random":

@@ -10,9 +10,13 @@ namespace PicRandShow
     {
         Single,
 
+        Sequence,
+
         Multiple,
 
         Random,
+
+        SingleMove,
 
         NotExist
 

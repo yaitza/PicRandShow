@@ -52,13 +52,14 @@ namespace PicRandShow
                 try
                 {
                     DisplayHandler dh = new DisplayHandler(new Point(this.panel.Width, this.panel.Height), names, this.picCount, this.intervalTime);
-                    PictureBox[] pbArray = dh.PhotoPlay(this.displayMode);
+                    PictureBox[] pbArray = dh.PhotoPlay(i, this.displayMode);
                     this.AddPictureBox(pbArray);
                     Thread.Sleep(1000 * this.intervalTime);
                     this.DeletePictureBox(pbArray);
                 }catch(Exception ex)
                 {
                     WritingOutput.ShowMethod(ex.Message);
+                    Thread.Sleep(1000 * this.intervalTime);
                     continue;
                 }
             }
@@ -128,9 +129,14 @@ namespace PicRandShow
                 foreach(PictureBox pictureBox in pb)
                 {
                     this.panel.Controls.Remove(pictureBox);
+                    pictureBox.Image.Dispose();
+                    pictureBox.Dispose();
                 }
+                pb = null;
+                this.panel.Controls.Clear();
                 this.panel.Refresh();
             }
+            GC.Collect();
         }
 
         private delegate void DisplayMessage(string msg);
