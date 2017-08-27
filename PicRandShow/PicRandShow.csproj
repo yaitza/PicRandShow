@@ -47,8 +47,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonHelper.cs" />
+    <Compile Include="DisplayMode\DisplayByMultiple.cs" />
+    <Compile Include="DisplayMode\DisplayByRandom.cs" />
+    <Compile Include="DisplayMode\DisplayBySequence.cs" />
+    <Compile Include="DisplayMode\DisplayBySingle.cs" />
     <Compile Include="DisplayEnum.cs" />
     <Compile Include="DisplayHandler.cs" />
+    <Compile Include="DisplayMode\DisplayMode.cs" />
     <Compile Include="FileAnalysis.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -56,6 +61,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="PictureBoxOperator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WritingOutput.cs" />
@@ -82,7 +88,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

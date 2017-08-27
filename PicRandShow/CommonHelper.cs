@@ -20,6 +20,8 @@ namespace PicRandShow
                     return DisplayEnum.Multiple;
                 case "random":
                     return DisplayEnum.Random;
+                case "singlemove":
+                    return DisplayEnum.SingleMove;
                 default:
                     return DisplayEnum.NotExist;
             }

@@ -29,7 +29,8 @@ namespace PicRandShow
             this.displayTimes = int.Parse(ConfigurationSettings.AppSettings["DisplayTimes"]);
 
             WritingOutput.ShowMethod += this.OutputLabel;
-
+            PictureBoxOperator.AddPictureBoxMethod += this.AddPictureBox;
+            PictureBoxOperator.DeletePictureBoxMethod += this.DeletePictureBox;
 
             Thread th = new Thread(DisplayPhotos);
             th.Start();
@@ -46,17 +47,39 @@ namespace PicRandShow
                 WritingOutput.ShowMethod($"{this.filePath}下无任何图片。");
                 return;
             }
+            //DisplayMode dm;
+            //switch (displayMode)
+            //{
 
-            for(int i=0; i<this.displayTimes; i++)
+            //    case DisplayEnum.Single:
+            //        dm = new DisplayBySingle(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+            //        break;
+            //    case DisplayEnum.Sequence:
+            //        dm = new DisplayBySequence(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+            //        break;
+            //    case DisplayEnum.Random:
+            //        dm = new DisplayByRandom(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+            //        break;
+            //    case DisplayEnum.Multiple:
+            //        dm = new DisplayByMultiple(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+            //        break;
+            //    default:
+            //        dm = new DisplayBySingle(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+            //        break;
+            //}
+            //dm.Play();
+
+            for (int i = 0; i < this.displayTimes; i++)
             {
                 try
                 {
                     DisplayHandler dh = new DisplayHandler(new Point(this.panel.Width, this.panel.Height), names, this.picCount, this.intervalTime);
                     PictureBox[] pbArray = dh.PhotoPlay(i, this.displayMode);
-                    this.AddPictureBox(pbArray);
+                    PictureBoxOperator.AddPictureBox(pbArray);
                     Thread.Sleep(1000 * this.intervalTime);
-                    this.DeletePictureBox(pbArray);
-                }catch(Exception ex)
+                    PictureBoxOperator.DeletePictureBox(pbArray);
+                }
+                catch (Exception ex)
                 {
                     WritingOutput.ShowMethod(ex.Message);
                     Thread.Sleep(1000 * this.intervalTime);
@@ -126,7 +149,7 @@ namespace PicRandShow
             }
             else
             {
-                foreach(PictureBox pictureBox in pb)
+                foreach (PictureBox pictureBox in pb)
                 {
                     this.panel.Controls.Remove(pictureBox);
                     pictureBox.Image.Dispose();
@@ -141,13 +164,12 @@ namespace PicRandShow
 
         private delegate void DisplayMessage(string msg);
 
-
         private void OutputLabel(string msg)
         {
             if (this.labelOutput.InvokeRequired)
             {
                 DisplayMessage dm = new DisplayMessage(OutputLabel);
-                this.Invoke(dm, new object[] { msg});
+                this.Invoke(dm, new object[] { msg });
             }
             else
             {

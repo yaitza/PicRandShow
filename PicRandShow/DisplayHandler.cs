@@ -13,7 +13,7 @@ namespace PicRandShow
 {
     class DisplayHandler
     {
-        private Point formXY;
+        private Point panelXY;
 
         private List<string> strFilePath;
 
@@ -23,7 +23,7 @@ namespace PicRandShow
 
         public DisplayHandler(Point sizeXY, List<string> strFilePath, int photoCount = 1, int switchTime = 2)
         {
-            this.formXY = sizeXY;
+            this.panelXY = sizeXY;
             this.strFilePath = strFilePath;
             this.disPhotoCount = photoCount;
             this.intervalTime = switchTime;
@@ -31,22 +31,26 @@ namespace PicRandShow
 
         public PictureBox[] PhotoPlay(int iCount, DisplayEnum displayMode = DisplayEnum.Single)
         {
+
+
             switch (displayMode)
             {
                 case DisplayEnum.Single:
-                    return PlaySingle();
+                    return PlayBySingle();
                 case DisplayEnum.Multiple:
-                    return PlayMultiple();
+                    return PlayByMultiple();
                 case DisplayEnum.Random:
-                    return PlayRandom();
+                    return PlayByRandom();
                 case DisplayEnum.Sequence:
-                    return PlaySequence(iCount);
+                    return PlayBySequence(iCount);
+                case DisplayEnum.SingleMove:
+                    return PlayBySingleMove();
                 default:
-                    return PlaySingle();
+                    return PlayBySingle();
             }
         }
 
-        private PictureBox[] PlaySequence(int iCount)
+        private PictureBox[] PlayBySequence(int iCount)
         {
             int iImagePosition = iCount;
             if (iCount > this.strFilePath.Count)
@@ -59,8 +63,8 @@ namespace PicRandShow
             int photoWidthX = photo.Width;
             int photoHeightY = photo.Height;
 
-            int panelWidthX = this.formXY.X;
-            int panelHeightY = this.formXY.Y;
+            int panelWidthX = this.panelXY.X;
+            int panelHeightY = this.panelXY.Y;
 
             Random ra = new Random();
             int widthX = 0;
@@ -88,15 +92,15 @@ namespace PicRandShow
             return new PictureBox[] { pb };
         }
 
-        private PictureBox[] PlaySingle()
+        private PictureBox[] PlayBySingle()
         {
             Image photo = Image.FromFile(this.strFilePath.First());
 
             int photoWidth = photo.Width;
             int photoHeight = photo.Height;
 
-            int panelWidth = this.formXY.X;
-            int panelHeight = this.formXY.Y;
+            int panelWidth = this.panelXY.X;
+            int panelHeight = this.panelXY.Y;
 
             PictureBox pb = new PictureBox();
 
@@ -126,17 +130,17 @@ namespace PicRandShow
             return new PictureBox[] { pb };
         }
 
-        private PictureBox[] PlayMultiple()
+        private PictureBox[] PlayByMultiple()
         {
             List<string> picLoactionInfos = new List<string>();
-            int panelWidthX = this.formXY.X;
-            int panelHeightY = this.formXY.Y;
+            int panelWidthX = this.panelXY.X;
+            int panelHeightY = this.panelXY.Y;
 
             List<PictureBox> listPb = new List<PictureBox>();
             for (int i = 0; i < this.disPhotoCount; i++)
             {
                 Random ra = new Random();
-
+                
                 Image photo = Image.FromFile(this.strFilePath[ra.Next(0, this.strFilePath.Count)]);
                 int photoWidth = photo.Width;
                 int photoHeight = photo.Height;
@@ -183,10 +187,10 @@ namespace PicRandShow
             return listPb.ToArray();
         }
 
-        private PictureBox[] PlayRandom()
+        private PictureBox[] PlayByRandom()
         {
-            int panelWidthX = this.formXY.X;
-            int panelHeightY = this.formXY.Y;
+            int panelWidthX = this.panelXY.X;
+            int panelHeightY = this.panelXY.Y;
             Random ra = new Random();
 
             string file = this.strFilePath[ra.Next(0, this.strFilePath.Count)];
@@ -219,6 +223,43 @@ namespace PicRandShow
             return new PictureBox[] { pb };
         }
 
+        private PictureBox[] PlayBySingleMove()
+        {
+            Image photo = Image.FromFile(this.strFilePath.First());
+
+            int photoWidth = photo.Width;
+            int photoHeight = photo.Height;
+
+            int panelWidth = this.panelXY.X;
+            int panelHeight = this.panelXY.Y;
+
+            PictureBox pb = new PictureBox();
+
+            Random ra = new Random();
+            int pointX = 0;
+            int pointY = 0;
+
+            if (photoWidth > panelWidth || photoHeight > panelHeight)
+            {
+                pb.Location = new Point(pointX, pointY);
+                pb.SizeMode = PictureBoxSizeMode.StretchImage;
+                pb.Size = new Size(400, 600);
+                pointX = ra.Next(0, Math.Abs(panelWidth - 400));
+                pointY = ra.Next(0, Math.Abs(panelHeight - 600));
+            }
+            else
+            {
+                pb.SizeMode = PictureBoxSizeMode.AutoSize;
+                pointX = ra.Next(0, Math.Abs(panelWidth - photoWidth));
+                pointY = ra.Next(0, Math.Abs(panelHeight - photoHeight));
+            }
+
+            pb.Location = new Point(pointX, pointY);
+            pb.Image = photo;
+
+            WritingOutput.ShowMessage($"坐标:[{pointX},{pointY}]  {this.strFilePath.First()}");
+            return new PictureBox[] { pb };
+        }
         /// <summary>
         /// 判断图片是否重叠
         /// </summary>
@@ -316,7 +357,7 @@ namespace PicRandShow
             int imgWidth = int.Parse(locationInfo[4]);
             int imgHeight = int.Parse(locationInfo[5]);
 
-            if (pointX+imgWidth<= panelWidth && pointY+imgHeight<=panelHeight)
+            if (pointX + imgWidth <= panelWidth && pointY + imgHeight <= panelHeight)
             {
                 isImageInPanel = true;
             }
