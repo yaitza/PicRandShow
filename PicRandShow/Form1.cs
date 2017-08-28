@@ -47,45 +47,45 @@ namespace PicRandShow
                 WritingOutput.ShowMethod($"{this.filePath}下无任何图片。");
                 return;
             }
-            //DisplayMode dm;
-            //switch (displayMode)
-            //{
-
-            //    case DisplayEnum.Single:
-            //        dm = new DisplayBySingle(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
-            //        break;
-            //    case DisplayEnum.Sequence:
-            //        dm = new DisplayBySequence(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
-            //        break;
-            //    case DisplayEnum.Random:
-            //        dm = new DisplayByRandom(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
-            //        break;
-            //    case DisplayEnum.Multiple:
-            //        dm = new DisplayByMultiple(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
-            //        break;
-            //    default:
-            //        dm = new DisplayBySingle(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
-            //        break;
-            //}
-            //dm.Play();
-
-            for (int i = 0; i < this.displayTimes; i++)
+            DisplayMode dm;
+            switch (displayMode)
             {
-                try
-                {
-                    DisplayHandler dh = new DisplayHandler(new Point(this.panel.Width, this.panel.Height), names, this.picCount, this.intervalTime);
-                    PictureBox[] pbArray = dh.PhotoPlay(i, this.displayMode);
-                    PictureBoxOperator.AddPictureBox(pbArray);
-                    Thread.Sleep(1000 * this.intervalTime);
-                    PictureBoxOperator.DeletePictureBox(pbArray);
-                }
-                catch (Exception ex)
-                {
-                    WritingOutput.ShowMethod(ex.Message);
-                    Thread.Sleep(1000 * this.intervalTime);
-                    continue;
-                }
+
+                case DisplayEnum.Single:
+                    dm = new DisplayBySingle(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+                    break;
+                case DisplayEnum.Sequence:
+                    dm = new DisplayBySequence(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+                    break;
+                case DisplayEnum.Random:
+                    dm = new DisplayByRandom(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+                    break;
+                case DisplayEnum.Multiple:
+                    dm = new DisplayByMultiple(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+                    break;
+                default:
+                    dm = new DisplayBySingle(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+                    break;
             }
+            dm.Play();
+
+//            for (int i = 0; i < this.displayTimes; i++)
+//            {
+//                try
+//                {
+//                    DisplayHandler dh = new DisplayHandler(new Point(this.panel.Width, this.panel.Height), names, this.picCount, this.intervalTime);
+//                    PictureBox[] pbArray = dh.PhotoPlay(i, this.displayMode);
+//                    PictureBoxOperator.AddPictureBox(pbArray);
+//                    Thread.Sleep(1000 * this.intervalTime);
+//                    PictureBoxOperator.DeletePictureBox(pbArray);
+//                }
+//                catch (Exception ex)
+//                {
+//                    WritingOutput.ShowMethod(ex.Message);
+//                    Thread.Sleep(1000 * this.intervalTime);
+//                    continue;
+//                }
+//            }
             WritingOutput.ShowMethod("图片展示完毕。");
         }
 
@@ -176,6 +176,13 @@ namespace PicRandShow
                 this.labelOutput.Text = $"{msg} {Environment.NewLine}";
                 this.labelOutput.Focus();
             }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.Dispose();
+            this.Close();
+            Environment.Exit(0);
         }
     }
 }
