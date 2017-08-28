@@ -63,6 +63,9 @@ namespace PicRandShow
                 case DisplayEnum.Multiple:
                     dm = new DisplayByMultiple(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
                     break;
+                case DisplayEnum.SingleMove:
+                    dm = new DisplayBySingleMove(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
+                    break;
                 default:
                     dm = new DisplayBySingle(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
                     break;
@@ -180,8 +183,6 @@ namespace PicRandShow
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            this.Dispose();
-            this.Close();
             Environment.Exit(0);
         }
     }
