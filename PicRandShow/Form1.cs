@@ -70,7 +70,15 @@ namespace PicRandShow
                     dm = new DisplayBySingle(new Size(this.panel.Width, this.panel.Height), names, this.displayTimes, this.picCount, this.intervalTime);
                     break;
             }
-            dm.Play();
+            try
+            {
+                dm.Play();
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
 
 //            for (int i = 0; i < this.displayTimes; i++)
 //            {
@@ -137,7 +145,7 @@ namespace PicRandShow
             else
             {
                 this.panel.Controls.AddRange(pb);
-                this.panel.Refresh();
+                //this.panel.Refresh();
             }
         }
 
@@ -160,7 +168,7 @@ namespace PicRandShow
                 }
                 pb = null;
                 this.panel.Controls.Clear();
-                this.panel.Refresh();
+                //this.panel.Refresh();
             }
             GC.Collect();
         }

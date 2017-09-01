@@ -20,18 +20,20 @@ namespace PicRandShow
         {
             for (int i = 0; i < this.DisImgCounts; i++)
             {
-                var pb = this.DisplayImgs(i);
-                for (int step = 0; step < PanelSize.Width; step++)
+                for (int step = 0; step < PanelSize.Width - 5; step = step + 5)
                 {
+                    var pb = this.DisplayImgs(i, step);
+
                     PictureBoxOperator.AddPictureBox(pb);
-                    Thread.Sleep(500);
+                    Thread.Sleep(500 * this.IntervalTime);
+                    PictureBoxOperator.AddPictureBox(this.DisplayImgs(i, step + 5));
                     PictureBoxOperator.DeletePictureBox(pb);
                 }
             }
 
         }
 
-        private PictureBox[] DisplayImgs(int iCount)
+        private PictureBox[] DisplayImgs(int iCount, int iStep)
         {
             Image photo = Image.FromFile(this.StrFilePaths[iCount]);
 
@@ -46,18 +48,19 @@ namespace PicRandShow
 
             if (photoWidth > panelWidth || photoHeight > panelHeight)
             {
-                pb.Location = new Point(0, 0);
                 pb.SizeMode = PictureBoxSizeMode.StretchImage;
                 pb.Size = new Size(400, 600);
+                pb.Location = new Point(iStep, panelHeight / 2 - 300);
             }
             else
             {
                 pb.SizeMode = PictureBoxSizeMode.AutoSize;
+                pb.Location = new Point(iStep, panelHeight / 2 - photoHeight / 2);
 
             }
 
-            pb.Location = new Point(0, 0);
             pb.Image = photo;
+            pb.BackColor = Color.Transparent;
 
             WritingOutput.ShowMessage($"坐标:[{0},{0}]  {this.StrFilePaths.First()}");
             return new PictureBox[] { pb };
