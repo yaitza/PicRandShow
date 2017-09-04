@@ -10,6 +10,9 @@ Picture Random Show 用于随机或者固定展示图片信息，并在展示过
 ### Random Mode
 ![Random](/Resource/Random.gif)
 
+### SingleMove Mode
+![Random](/Resource/SingleMove.gif)
+
 ## Settings
 相关模式的设置主要采用配置文件的方式，对文件PicRandShow.exe.config进行相关设置，可以达到目前支持的三种效果展示。  
 ![Setting](/Resource/Setting.png)
