@@ -50,6 +50,7 @@
     <Compile Include="DisplayMode\DisplayByMultiple.cs" />
     <Compile Include="DisplayMode\DisplayByRandom.cs" />
     <Compile Include="DisplayMode\DisplayBySequence.cs" />
+    <Compile Include="DisplayMode\DisplayBySingleMove.cs" />
     <Compile Include="DisplayMode\DisplayBySingle.cs" />
     <Compile Include="DisplayEnum.cs" />
     <Compile Include="DisplayHandler.cs" />
