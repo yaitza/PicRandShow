@@ -24,4 +24,4 @@ Picture Random Show 用于随机或者固定展示图片信息，并在展示过
 - 需要进一步了解委托，事件的相关原理以及实现方式。
 - 需要了解线程的原理，以及实际实现细节。
 
-[详见](https://yaitza.github.io/2017-08-20-CSharp-PicRandShow）。
+[详见]:<https://yaitza.github.io/2017-08-20-CSharp-PicRandShow>。
