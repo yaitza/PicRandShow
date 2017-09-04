@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,18 @@ namespace PicRandShow
             if(DeletePictureBoxMethod != null)
             {
                 DeletePictureBoxMethod.Invoke(pb);
+            }
+        }
+
+        public delegate void MoveLocationHandler(Point point, PictureBox pb);
+
+        public static MoveLocationHandler MoveLocationMethod { get; set; }
+
+        public static void MoveLocation(Point point, PictureBox pb)
+        {
+            if (MoveLocationMethod != null)
+            {
+                MoveLocationMethod.Invoke(point, pb);
             }
         }
     }

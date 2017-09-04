@@ -20,20 +20,22 @@ namespace PicRandShow
         {
             for (int i = 0; i < this.DisImgCounts; i++)
             {
-                for (int step = 0; step < PanelSize.Width - 5; step = step + 5)
+                int height = 0;
+                var pb = this.DisplayImgs(i, ref height);
+                PictureBoxOperator.AddPictureBox(pb);
+
+                for (int step = 0; step < PanelSize.Width - 11; step = step + 10)
                 {
-                    var pb = this.DisplayImgs(i, step);
-
-                    PictureBoxOperator.AddPictureBox(pb);
-                    Thread.Sleep(500 * this.IntervalTime);
-                    PictureBoxOperator.AddPictureBox(this.DisplayImgs(i, step + 5));
-                    PictureBoxOperator.DeletePictureBox(pb);
+                    Point location = new Point(step, height);
+                    PictureBoxOperator.MoveLocation(location, pb[0]);
+                    WritingOutput.ShowMessage($"坐标:[{location.X},{location.Y}]");
+                    Thread.Sleep(50 * this.IntervalTime);
                 }
+                PictureBoxOperator.DeletePictureBox(pb);
             }
-
         }
 
-        private PictureBox[] DisplayImgs(int iCount, int iStep)
+        private PictureBox[] DisplayImgs(int iCount, ref int height)
         {
             Image photo = Image.FromFile(this.StrFilePaths[iCount]);
 
@@ -50,19 +52,19 @@ namespace PicRandShow
             {
                 pb.SizeMode = PictureBoxSizeMode.StretchImage;
                 pb.Size = new Size(400, 600);
-                pb.Location = new Point(iStep, panelHeight / 2 - 300);
+                height = panelHeight / 2 - 300 / 2;
             }
             else
             {
                 pb.SizeMode = PictureBoxSizeMode.AutoSize;
-                pb.Location = new Point(iStep, panelHeight / 2 - photoHeight / 2);
-
+                height = panelHeight / 2 - photoHeight / 2;
             }
 
+            pb.Location = new Point(0, height);
             pb.Image = photo;
             pb.BackColor = Color.Transparent;
 
-            WritingOutput.ShowMessage($"坐标:[{0},{0}]  {this.StrFilePaths.First()}");
+            WritingOutput.ShowMessage($"坐标:[{0},{height}]  {this.StrFilePaths[iCount]}");
             return new PictureBox[] { pb };
         }
 
